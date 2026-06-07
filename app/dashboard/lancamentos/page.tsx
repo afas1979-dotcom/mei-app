@@ -12,19 +12,32 @@ export default function LancamentosPage() {
   const [tipo, setTipo] = useState('')
   const [mes, setMes] = useState(mesAtual())
   const [carregando, setCarregando] = useState(true)
+  const [empresaId, setEmpresaId] = useState<string | null>(null)
   const ano = anoAtual()
 
-  useEffect(() => { carregarDados() }, [tipo, mes])
+  useEffect(() => { carregarEmpresa() }, [])
+  useEffect(() => { if (empresaId) carregarLancamentos() }, [empresaId, tipo, mes])
 
-  async function carregarDados() {
+  async function carregarEmpresa() {
+    const supabase = createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return
+    const { data } = await supabase.from('empresas_mei').select('id').eq('usuario_id', user.id).eq('ativa', true).limit(1)
+    if (data?.length) setEmpresaId(data[0].id)
+    else setCarregando(false)
+  }
+
+  async function carregarLancamentos() {
+    if (!empresaId) return
     setCarregando(true)
     const supabase = createClient()
-    const { data: empresas } = await supabase.from('empresas_mei').select('id').eq('ativa', true).limit(1)
-    if (!empresas?.length) { setCarregando(false); return }
     const mesStr = String(mes).padStart(2, '0')
-    let query = supabase.from('lancamentos').select('*').eq('empresa_id', empresas[0].id).order('data', { ascending: false }).gte('data', `${ano}-${mesStr}-01`).lte('data', `${ano}-${mesStr}-31`)
+    const dataInicio = `${ano}-${mesStr}-01`
+    const ultimoDia = new Date(ano, mes, 0).getDate(); const dataFim = `${ano}-${mesStr}-${String(ultimoDia).padStart(2, '0')}`
+    let query = supabase.from('lancamentos').select('*').eq('empresa_id', empresaId).gte('data', dataInicio).lte('data', dataFim).order('data', { ascending: false })
     if (tipo) query = query.eq('tipo', tipo)
-    const { data } = await query
+    const { data, error } = await query
+    if (error) console.error('Erro:', error)
     setLancamentos(data ?? [])
     setCarregando(false)
   }
@@ -65,8 +78,13 @@ export default function LancamentosPage() {
       </div>
       <div className="bg-[#13131a] border border-white/5 rounded-2xl overflow-hidden">
         {carregando ? <div className="p-12 text-center text-white/20 text-sm">Carregando...</div>
-        : lancamentos.length === 0 ? <div className="p-12 text-center"><p className="text-white/20 text-sm mb-3">Nenhum lançamento neste período.</p><Link href="/dashboard/lancamentos/novo" className="text-violet-400 text-sm">Registrar agora →</Link></div>
-        : <table className="w-full">
+        : lancamentos.length === 0 ? (
+          <div className="p-12 text-center">
+            <p className="text-white/20 text-sm mb-1">Nenhum lançamento em {MESES[mes-1]}/{ano}.</p>
+            <Link href="/dashboard/lancamentos/novo" className="text-violet-400 text-sm">Registrar agora →</Link>
+          </div>
+        ) : (
+          <table className="w-full">
             <thead><tr className="border-b border-white/5">
               <th className="text-left px-6 py-3 text-white/30 text-xs font-normal">Descrição</th>
               <th className="text-left px-6 py-3 text-white/30 text-xs font-normal">Data</th>
@@ -85,7 +103,8 @@ export default function LancamentosPage() {
                 </tr>
               ))}
             </tbody>
-          </table>}
+          </table>
+        )}
       </div>
     </div>
   )
