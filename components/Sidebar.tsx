@@ -1,5 +1,6 @@
 'use client'
 import Link from 'next/link'
+import Image from 'next/image'
 import { usePathname, useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
@@ -21,14 +22,15 @@ export default function Sidebar() {
   }
   return (
     <aside className="fixed left-0 top-0 h-screen w-64 bg-[#13131a] border-r border-white/5 flex flex-col z-40">
-      <div className="px-6 py-7 border-b border-white/5">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-indigo-600 flex items-center justify-center text-white text-sm font-bold">M</div>
-          <div>
-            <p className="text-white font-semibold text-sm tracking-wide">MEI App</p>
-            <p className="text-white/30 text-xs">Gestão Financeira</p>
-          </div>
-        </div>
+      <div className="px-6 py-5 border-b border-white/5">
+        <Image
+          src="/AX.png"
+          alt="Xpert AX Contabilidade"
+          width={160}
+          height={60}
+          className="object-contain brightness-110"
+          priority
+        />
       </div>
       <nav className="flex-1 px-3 py-5 space-y-1">
         {nav.map((item) => {
