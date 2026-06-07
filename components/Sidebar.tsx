@@ -7,6 +7,7 @@ const nav = [
   { href: '/dashboard', label: 'Dashboard', icon: '▦' },
   { href: '/dashboard/lancamentos', label: 'Lançamentos', icon: '⇄' },
   { href: '/dashboard/lancamentos/novo', label: 'Novo lançamento', icon: '+' },
+  { href: '/dashboard/assistente', label: 'Assistente IA', icon: '✦' },
   { href: '/dashboard/empresa', label: 'Empresa', icon: '◎' },
 ]
 
