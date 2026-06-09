@@ -10,6 +10,7 @@ const nav = [
   { href: '/dashboard/lancamentos', label: 'Lançamentos', icon: '⇄' },
   { href: '/dashboard/lancamentos/novo', label: 'Novo lançamento', icon: '+' },
   { href: '/dashboard/relatorios', label: 'Relatórios', icon: '◈' },
+  { href: '/dashboard/recibos', label: 'Recibos', icon: '◻' },
   { href: '/dashboard/assistente', label: 'Assistente IA', icon: '✦' },
   { href: '/dashboard/empresa', label: 'Empresa', icon: '◎' },
 ]
